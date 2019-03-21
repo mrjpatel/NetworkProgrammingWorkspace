@@ -65,7 +65,7 @@ public class Task2point1 {
 	        	
 	        }
 	        
-	        System.out.println("\nCalculated Checksum: " + checksum.getChecksum().getValue());
+	        System.out.println("Calculated Checksum: " + checksum.getChecksum().getValue());
 	        checksum.close();
 		} 
 		catch (FileNotFoundException e) {
