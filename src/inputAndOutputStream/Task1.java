@@ -1,5 +1,5 @@
 /**
- * 
+ * Input And Output Stream Example
  */
 package inputAndOutputStream;
 
@@ -48,11 +48,12 @@ public class Task1 {
 					break;
 				}
 			}
+			bufferedReader.close();
 			inputStream.close();
 			return stringBuffer.toString();
 		} 
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Unable to take input. Please try again later. " + e);
 		}
 		return null;
 	}
