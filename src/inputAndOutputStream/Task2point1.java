@@ -13,8 +13,8 @@ public class Task2point1 {
 	 * @param args file names as arguments
 	 */
 	public static void main(String[] args) {
-		String filename = "src/inputAndOutputStream/" + args[0];
-		String checkSumFilename = "src/inputAndOutputStream/" + args[1];
+		String filename = "" + args[0];
+		String checkSumFilename = "" + args[1];
 		
 		System.out.println(readFile(filename));
 		calculateCheckSum(filename);

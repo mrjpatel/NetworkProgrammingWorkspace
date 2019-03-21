@@ -10,9 +10,9 @@ import java.util.zip.CheckedInputStream;
 
 public class Task2 {
 	
-	private static String FILENAME = "src/inputAndOutputStream/";
+	private static String FILENAME = "";
 	
-	private static String CHECKSUM_FILENAME = "src/inputAndOutputStream/";
+	private static String CHECKSUM_FILENAME = "";
 	
 	private static long checksum = 0;
 	
