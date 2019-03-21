@@ -33,8 +33,8 @@ public class Task2 {
 	}
 	
 	/**
-	 * Process User Input and write the cehcksum to the file
-	 * @param inputStream the input stream to read keybord input
+	 * Process User Input and write the checksum to the file
+	 * @param inputStream the input stream to read keyboard input
 	 */
 	private static void processInputAndCalculateChecksum(InputStream inputStream) {
 		CheckedInputStream checkedInputStream = null;        
@@ -53,14 +53,15 @@ public class Task2 {
 					inputStream.close();
 					userInput = stringBuffer.toString();
 					System.out.println("Checksum "+ checksum);
-					writeToFile(String.valueOf(checksum), CHECKSUM_FILENAME); //write checksum to cehcksum file.
+					writeToFile(String.valueOf(checksum), CHECKSUM_FILENAME);
 				}
 				stringBuffer.append(character);
 				checksum = checkedInputStream.getChecksum().getValue();
 			}
-        } 
+            
+        }
         catch (IOException e) {
-        	System.out.println("IO Exception. " + e);
+            checksum = 0;
         }
 	}
 
@@ -87,5 +88,4 @@ public class Task2 {
 			System.out.println("Cannot write the input to file at this time. Try again later " + e);
 		}
 	}
-	
 }
