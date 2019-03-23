@@ -29,7 +29,7 @@ public class Task1 {
 	private static String readingUserInput() {
 		InputStream inputStream = System.in;
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader, 1024);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 		
 		int inputChars;
 		StringBuffer stringBuffer = new StringBuffer();
