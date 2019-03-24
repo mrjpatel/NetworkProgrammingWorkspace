@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
-public class Task2point1 {
+public class ReadsCheckSumFile {
 
 	/**
 	 * Read the file contents, calculates the checksum and reads the existing checksum
@@ -59,10 +59,7 @@ public class Task2point1 {
 		try {
 			fileInputStream = new FileInputStream(filename);
 			CheckedInputStream checksum = new CheckedInputStream(fileInputStream, new Adler32());
-	        byte[] buffer = new byte[1024];
-	        
-	        while(checksum.read(buffer, 0, buffer.length) >= 0) {
-	        	
+	        while(checksum.read() >= 0) {	
 	        }
 	        
 	        System.out.println("Calculated Checksum: " + checksum.getChecksum().getValue());

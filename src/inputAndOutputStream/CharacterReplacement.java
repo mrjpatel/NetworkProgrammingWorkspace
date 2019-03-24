@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
  * <p>Warnings: <b>None</b></p>
  * @author Japan Patel
  */
-public class Task1 {
+public class CharacterReplacement {
 
 	public static void main(String[] args) {
 		String userInput = readingUserInput();
