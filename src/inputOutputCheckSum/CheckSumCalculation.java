@@ -1,4 +1,4 @@
-package inputAndOutputStream;
+package inputOutputCheckSum;
 
 import java.io.BufferedReader;
 import java.io.File;

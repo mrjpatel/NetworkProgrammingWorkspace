@@ -1,7 +1,7 @@
 /**
  * Input And Output Stream Example
  */
-package inputAndOutputStream;
+package inputOutputCheckSum;
 
 import java.io.BufferedReader;
 import java.io.IOException;
