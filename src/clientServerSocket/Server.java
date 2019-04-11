@@ -1,10 +1,14 @@
 package clientServerSocket;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 
 /**
  * A TCP server that runs on user desired port
@@ -15,6 +19,11 @@ import java.util.Date;
  * @author Japan Patel
  */
 public class Server {
+	
+	/**
+	 * The output file
+	 */
+	private static final String ONE_HUNDRED_MEGABYTE_FILE = "100_megabyte_file_out.txt";
 	
 	/**
 	 * Port number
@@ -32,9 +41,19 @@ public class Server {
 	private Socket socket;
 	
 	/**
-	 * Writes data on a given stream
+	 * Output stream for file
 	 */
-	private PrintWriter printWriter;
+	private FileOutputStream fileOutputStream;
+	
+	/**
+	 * Writes data to the file
+	 */
+	private BufferedOutputStream bufferedOutputStream;
+	
+	/**
+	 * Reads buffer received from Client
+	 */
+	private InputStream inputStream = null;;
 	
 	/**
 	 * Runs the server
@@ -64,15 +83,40 @@ public class Server {
 			System.out.println("Server started on port: " + port);
 			
 			socket = serverSocket.accept();
-			System.out.println("Connection Successful. Sending data...");
+			System.out.println("Connection Successful. Waiting for data...");
 			
-			printWriter = new PrintWriter(socket.getOutputStream(), true);
-			printWriter.println(new Date().toString());
-			System.out.println("Successfully sent data to client.");
-			
+			buildFileFromStream();
 		} 
 		catch (IOException e) {
 			System.out.println("IO exception when connecting to client. " + e);
+		}
+	}
+	
+	/**
+	 * Reads and write the byte stream from 
+	 * the client onto the server disk
+	 */
+	private void buildFileFromStream() {
+		File file = new File(ONE_HUNDRED_MEGABYTE_FILE);
+		try {
+			fileOutputStream = new FileOutputStream(file);
+			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+			byte [] buffer = new byte[1024];
+            int bytesRead;
+			do {
+				bytesRead = inputStream.read(buffer, 0, buffer.length);
+				if(bytesRead <= 0) {
+					break;
+				}
+                bufferedOutputStream.write(buffer, 0, bytesRead);
+                bufferedOutputStream.flush();
+            }
+            while (true);
+			closeConnection();
+		}
+		catch (IOException e) {
+			System.out.println("Cannot find the file." + e);
+			closeConnection();
 		}
 	}
 	
@@ -82,7 +126,8 @@ public class Server {
 	public void closeConnection() {
 		System.out.println("Closing connection now...");
 		try {
-			printWriter.close();
+			bufferedOutputStream.close();
+			inputStream.close();
 			socket.close();
 			serverSocket.close();
 		} 
