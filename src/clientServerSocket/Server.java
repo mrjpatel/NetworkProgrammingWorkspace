@@ -1,12 +1,10 @@
 package clientServerSocket;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -84,7 +82,7 @@ public class Server {
 			
 			socket = serverSocket.accept();
 			System.out.println("Connection Successful. Waiting for data...");
-			
+			inputStream = socket.getInputStream();
 			buildFileFromStream();
 		} 
 		catch (IOException e) {
@@ -99,6 +97,7 @@ public class Server {
 	private void buildFileFromStream() {
 		File file = new File(ONE_HUNDRED_MEGABYTE_FILE);
 		try {
+			
 			fileOutputStream = new FileOutputStream(file);
 			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			byte [] buffer = new byte[1024];
@@ -112,10 +111,13 @@ public class Server {
                 bufferedOutputStream.flush();
             }
             while (true);
-			closeConnection();
+			
+			bufferedOutputStream.close();
+			inputStream.close();
+			System.out.println("CLosed the stream");
 		}
 		catch (IOException e) {
-			System.out.println("Cannot find the file." + e);
+			System.out.println("Cannot create the file." + e);
 			closeConnection();
 		}
 	}
@@ -126,8 +128,6 @@ public class Server {
 	public void closeConnection() {
 		System.out.println("Closing connection now...");
 		try {
-			bufferedOutputStream.close();
-			inputStream.close();
 			socket.close();
 			serverSocket.close();
 		} 
