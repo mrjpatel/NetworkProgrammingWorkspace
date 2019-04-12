@@ -1,10 +1,13 @@
 package clientServerSocket;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -51,7 +54,9 @@ public class Server {
 	/**
 	 * Reads buffer received from Client
 	 */
-	private InputStream inputStream = null;;
+	private InputStream inputStream = null;
+	
+	private PrintWriter printWriter;
 	
 	/**
 	 * Runs the server
@@ -60,7 +65,6 @@ public class Server {
 	public static void main(String[] args) {		
 		Server server = new Server(Integer.parseInt(args[0]));
 		server.connectToClient();
-//		server.closeConnection();
 	}
 	
 	/**
@@ -79,15 +83,51 @@ public class Server {
 		try {
 			serverSocket = new ServerSocket(port);
 			System.out.println("Server started on port: " + port);
-			
 			socket = serverSocket.accept();
 			System.out.println("Connection Successful. Waiting for data...");
 			inputStream = socket.getInputStream();
+			
+			printWriter = new PrintWriter(socket.getOutputStream(), true);	
+			printWriter.println(getFileNameFromUser());	
+			System.out.println("Successfully sent file request to client.");
+			System.out.println("Waiting for a file...");
 			buildFileFromStream();
 		} 
 		catch (IOException e) {
 			System.out.println("IO exception when connecting to client. " + e);
 		}
+	}
+	
+	/**
+	 * Reads User Input for a filename
+	 * @return filename
+	 */
+	private String getFileNameFromUser() {
+		InputStream inputStream = System.in;
+		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		int inputChars;
+		StringBuffer stringBuffer = new StringBuffer();
+		
+		System.out.print("Please enter filename to you want: ");
+		try {
+			while((inputChars = bufferedReader.read()) != -1) {
+				char character = (char)inputChars;
+				if(character != '\n') {
+					stringBuffer.append(character);
+				}
+				else {
+					break;
+				}
+			}
+			bufferedReader.close();
+			inputStream.close();
+			return stringBuffer.toString();
+		} 
+		catch (IOException e) {
+			System.out.println("Unable to take input. Please try again later. " + e);
+		}
+		return null;
 	}
 	
 	/**

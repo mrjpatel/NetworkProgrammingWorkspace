@@ -43,6 +43,8 @@ public class Client {
 	 */
 	private BufferedOutputStream bufferedOutputStream;
 	
+	private BufferedReader bufferReader;
+	
 	/**
 	 * Runs the server
 	 * @param args None.
@@ -108,9 +110,11 @@ public class Client {
 			System.out.println("Attempting to connect to server on: " + this.address + ":" + this.port);
 			clientSocket = new Socket(address, port);
 			System.out.println("Server Connected! Waiting for a message...");
+			bufferReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			String filename = getFileNameFromServer();
 			bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
 			
-			readAndSendFile();
+			readAndSendFile(filename);
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
@@ -118,13 +122,29 @@ public class Client {
     }
 	
 	/**
+	 * Gets the filename from Server
+	 * @return
+	 */
+	private String getFileNameFromServer() {
+		
+		String message;
+		try {
+			message = bufferReader.readLine();
+			return message;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Reads files and sends to server
 	 */
-	private void readAndSendFile() {
+	private void readAndSendFile(String filename) {
 		System.out.println("Reading file...");
 		FileInputStream fileInputStream;
 		try {
-			fileInputStream = new FileInputStream(new File("readingFile.txt"));
+			fileInputStream = new FileInputStream(new File(filename));
 			inputStream = new InputStreamReader(fileInputStream);
 	        int bytesRead;
 	        System.out.println("About to start sending file...");
