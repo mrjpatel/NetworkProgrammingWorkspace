@@ -21,7 +21,7 @@ public class Server {
 	/**
 	 * The output file
 	 */
-	private static final String ONE_HUNDRED_MEGABYTE_FILE = "100_megabyte_file_out.txt";
+	private static final String OUTPUT_FILE = "outputFile.txt";
 	
 	/**
 	 * Port number
@@ -60,7 +60,7 @@ public class Server {
 	public static void main(String[] args) {		
 		Server server = new Server(Integer.parseInt(args[0]));
 		server.connectToClient();
-		server.closeConnection();
+//		server.closeConnection();
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class Server {
 	 * the client onto the server disk
 	 */
 	private void buildFileFromStream() {
-		File file = new File(ONE_HUNDRED_MEGABYTE_FILE);
+		File file = new File(OUTPUT_FILE);
 		try {
 			
 			fileOutputStream = new FileOutputStream(file);
@@ -111,10 +111,12 @@ public class Server {
                 bufferedOutputStream.flush();
             }
             while (true);
+			System.out.println("File contents successfully and saved to: " + OUTPUT_FILE);
 			
 			bufferedOutputStream.close();
 			inputStream.close();
 			System.out.println("CLosed the stream");
+			closeConnection();
 		}
 		catch (IOException e) {
 			System.out.println("Cannot create the file." + e);

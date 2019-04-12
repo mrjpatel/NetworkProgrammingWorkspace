@@ -1,8 +1,14 @@
 package clientServerSocket;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
@@ -30,9 +36,14 @@ public class Client {
 	private Socket clientSocket;
 	
 	/**
-	 * Buffered Reader reads user input
+	 * Input stream to read file
 	 */
-	private BufferedReader bufferReader;
+	private InputStreamReader inputStream;
+	
+	/**
+	 * Output stream to send file contents
+	 */
+	private BufferedOutputStream bufferedOutputStream;
 	
 	/**
 	 * Runs the server
@@ -61,7 +72,7 @@ public class Client {
 	 * and the port numbers
 	 */
 	public void getServerAddress() {
-		System.out.print("Please input the server address (e.g. 127.0.0.1:61027) - ");
+		System.out.print("Please input the server address (e.g. 127.0.0.1:61207) - ");
 		BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in)); 
 		try {
 			String userInput = reader.readLine();
@@ -74,18 +85,34 @@ public class Client {
 	}
 	
 	/**
+	 * Reads User input for a desired server address
+	 * and the port numbers
+	 */
+	public String getFilename() {
+		System.out.print("Please enter name of the file that you want to receive - ");
+		BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in)); 
+		try {
+			String userInput = reader.readLine();
+			return userInput;
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Connects to the Server and
 	 * Reads the data sent from the server.
 	 */
-	public void connectToServer(){
+	private void connectToServer(){
 		try {
 			System.out.println("Attempting to connect to server on: " + this.address + ":" + this.port);
 			clientSocket = new Socket(address, port);
 			System.out.println("Server Connected! Waiting for a message...");
+			bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
 			
-			bufferReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			String message = bufferReader.readLine();
-			System.out.println("Message received from server: " + message);
+			readAndSendFile();
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
@@ -93,12 +120,43 @@ public class Client {
     }
 	
 	/**
+	 * Reads files and sends to server
+	 */
+	private void readAndSendFile() {
+		System.out.println("Reading file...");
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(new File("readingFile.txt"));
+			inputStream = new InputStreamReader(fileInputStream);
+	        int bytesRead;
+	        System.out.println("About to start sending file...");
+			do {
+				bytesRead = inputStream.read();
+				if(bytesRead <= 0) {
+					break;
+				}
+				bufferedOutputStream.write(bytesRead);
+				bufferedOutputStream.flush();
+	        }
+	        while (true);
+			System.out.println("File contents sent successfully...");
+			inputStream.close();
+		} 
+		catch (FileNotFoundException e) {
+			System.out.println("File cannot be found: " + e);
+		}
+		catch (IOException e) {
+			System.out.println("Cannot send data to server: " + e);
+		}
+		
+	}
+	
+	/**
 	 * Closes the connection
 	 */
 	public void closeConnection() {
 		System.out.println("Closing connection...");
 		try {
-			bufferReader.close();
 			clientSocket.close();
 		} 
 		catch (IOException e) {
