@@ -8,14 +8,22 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * A server that accepts multiple clients simultaneously
+ * and stores data to a file
+ * @author Japan Patel
+ */
 public class Server implements Runnable{
 	
 	private int port = 0;
-	
 	private ServerSocket serverSocket;
 
+	/**
+	 * Intialise Server object and starts 
+	 * server socket thread
+	 * @param args takes int for port
+	 */
     public static void main(String [] args){
-    	
     	int port = Integer.parseInt(args[0]);
         Server server = new Server(port);
     	
@@ -23,14 +31,26 @@ public class Server implements Runnable{
     	connectionThread.start();
     }
     
+    /**
+     * Server Constructor
+     * @param port port to start server on
+     */
     public Server(int port) {
     	this.port = port;
     }
     
+    /**
+     * Checks if the current thread is Interrupted.
+     * @return true if the thread is interrupted
+     */
     private boolean isThreadInterrupted(){
 		return Thread.currentThread().isInterrupted();
 	}
     
+    /**
+     * Starts Server and once client accepts the connection
+     * It gives the client socket to the data receiver
+     */
     @Override
 	public void run() {
     	try {
@@ -39,15 +59,21 @@ public class Server implements Runnable{
 			
 			while(!isThreadInterrupted()){
 				Socket clientSocket = serverSocket.accept();
+				System.out.println("Client connected from: " + clientSocket.getInetAddress() + ": " + clientSocket.getPort());
 				new ServerFileReceiver(clientSocket);
 			}
 			serverSocket.close();
 		}
     	catch (IOException e) {
-			e.printStackTrace();
+    		System.out.println("Cannot create a server socket socket on: " + port + "\n" + e);
 		}
 	}
     
+    /**
+     * A file receiver Class that receives data from client
+     * and stores it in file.
+     * @author Japan Patel
+     */
     private class ServerFileReceiver{
 
     	private Socket clientSocket;
@@ -56,12 +82,18 @@ public class Server implements Runnable{
 	    private BufferedOutputStream bufferedOutputStream = null;
 	    private String ONE_HUNDRED_MEGABYTE_FILE = "100_megabyte_file_out_";
     	
+	    /**
+	     * Constructor for the File Receiver
+	     * @param clientSocket Client Socket that the server has bind to.
+	     */
 		public ServerFileReceiver(Socket clientSocket) {
 			this.clientSocket = clientSocket;
 			this.readFileData();
-//			System.out.println("Inside the file receiver: " + clientSocket.getLocalPort());
 		}
 		
+		/**
+		 * Generates a file based on client data.
+		 */
 		private void readFileData() {
 			try {
 				inputStream = clientSocket.getInputStream();
@@ -71,7 +103,7 @@ public class Server implements Runnable{
 				File file = new File(ONE_HUNDRED_MEGABYTE_FILE + clientSocket.getPort() + ".txt");
 				fileOutputStream = new FileOutputStream(file);
 				bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-				
+				System.out.println("Receiving file contents from client: " + clientSocket.getInetAddress() + ": " + clientSocket.getPort());
 				do {
 					bytesRead = inputStream.read(buffer, 0, buffer.length);
 					if(bytesRead <= 0)
@@ -79,20 +111,22 @@ public class Server implements Runnable{
 					bufferedOutputStream.write(buffer, 0, bytesRead);
 					bufferedOutputStream.flush();
 				} while (true);
+				System.out.println("Finished writing to a file for: " + clientSocket.getInetAddress() + ": " + clientSocket.getPort());
+				System.out.println("Exported file: " + file.getName());
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Cannot receive data from client: " + e);
 			}
 			finally {
 				try {
 					bufferedOutputStream.close();
 					inputStream.close();
 					clientSocket.close();
+					System.out.println("Successfully closed the socket.");
 				}
 				catch (IOException e) {
-					e.printStackTrace();
+					System.out.println("Cannot close stream and the cient socket: " + e);
 				}
-				
 			}
 		}	
     }
