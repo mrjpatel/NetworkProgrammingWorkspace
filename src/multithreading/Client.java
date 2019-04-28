@@ -9,21 +9,42 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Client Class that reads files asynchronously
+ * and sends to Server
+ * @author Japan Patel
+ */
 public class Client implements Runnable{
 	
 	private static ConcurrentLinkedQueue<Integer> messageQueue;
 	private Socket clientSocket;
 	
+	private static String address;
+	private static int port;
 	
-	public static void main(String args[]) { 
+	/**
+	 * Initialise Client
+	 * @param args args[0] address args[1] port
+	 */
+	public static void main(String args[]) {
+		
 		Client client = new Client();
+		address = args[0];
+		port = Integer.parseInt(args[1]);
 		client.createThreads(client);
     }
 	
+	/**
+	 * Constructor. Initialises Concurrent message queue
+	 */
 	public Client() {
 		messageQueue = new ConcurrentLinkedQueue<Integer>();
 	}
 	
+	/**
+	 * Creates File reader threds and Connection Threads
+	 * @param client Client Instance
+	 */
 	private void createThreads(Client client) {
 		//Starts File reading thread which is asynchronous
 		FileReader reader = new FileReader(client);
@@ -37,15 +58,22 @@ public class Client implements Runnable{
         System.out.println(connectionThread.getName() + ": Started Connection to Server Thread");
 	}
 	
+	/**
+	 * Queues Messages read from file.
+	 * @param message Messsage in integer format
+	 */
 	public void queueMessages(int message) {
 		messageQueue.add(message);
 	}
 	
+	/**
+	 * Connects to Server and sends data from message queue
+	 */
 	@Override
 	public void run() {
 		try {
-			System.out.println(Thread.currentThread().getName() + ": Attempting to connect to server on: " + "localhost" + ":" + "61207");
-			clientSocket = new Socket("localhost", 61207);
+			System.out.println(Thread.currentThread().getName() + ": Attempting to connect to server on: " + address + ":" + port);
+			clientSocket = new Socket(address, port);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
 			System.out.println(Thread.currentThread().getName() + ": Successfully Connected to Server! on port: " + clientSocket.getLocalPort());
 			System.out.println(Thread.currentThread().getName() + ": Started reading from queue...");
@@ -64,15 +92,28 @@ public class Client implements Runnable{
 		}
 	}
 	
+	/**
+	 * File Reader Class.
+	 * Reads file data and gives it to concurrent queue.
+	 * @author Japan Patel
+	 *
+	 */
 	private class FileReader implements Runnable{
 		
 		private static final String FILE_NAME = "100_megabyte_file.txt";
 		private Client client;
 		
+		/**
+		 * Constructor
+		 * @param client Client Instance
+		 */
 		public FileReader(Client client) {
 			this.client = client;
 		}
 
+		/**
+		 * Reads file contents
+		 */
 		@Override
 		public void run() {
 			FileInputStream fileInputStream;
