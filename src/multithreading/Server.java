@@ -60,7 +60,9 @@ public class Server implements Runnable{
 			while(!isThreadInterrupted()){
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("Client connected from: " + clientSocket.getInetAddress() + ": " + clientSocket.getPort());
-				new ServerFileReceiver(clientSocket);
+				ServerFileReceiver fileReceiver = new ServerFileReceiver(clientSocket);
+				Thread fileReceiverThread = new Thread(fileReceiver);
+				fileReceiverThread.start();
 			}
 			serverSocket.close();
 		}
@@ -74,7 +76,7 @@ public class Server implements Runnable{
      * and stores it in file.
      * @author Japan Patel
      */
-    private class ServerFileReceiver{
+    private class ServerFileReceiver implements Runnable{
 
     	private Socket clientSocket;
 	    private InputStream inputStream = null;
@@ -88,7 +90,6 @@ public class Server implements Runnable{
 	     */
 		public ServerFileReceiver(Socket clientSocket) {
 			this.clientSocket = clientSocket;
-			this.readFileData();
 		}
 		
 		/**
@@ -115,19 +116,26 @@ public class Server implements Runnable{
 				System.out.println("Exported file: " + file.getName());
 			}
 			catch (IOException e) {
-				System.out.println("Cannot receive data from client: " + e);
+				System.out.println("Client socket closed on port: " + clientSocket.getPort());
+				System.out.println("Closing the port...");
+				
 			}
 			finally {
 				try {
 					bufferedOutputStream.close();
 					inputStream.close();
 					clientSocket.close();
-					System.out.println("Successfully closed the socket.");
+					System.out.println("Successfully closed the socket on port." + clientSocket.getPort());
 				}
 				catch (IOException e) {
 					System.out.println("Cannot close stream and the cient socket: " + e);
 				}
 			}
+		}
+
+		@Override
+		public void run() {
+			readFileData();
 		}	
     }
 }
