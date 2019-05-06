@@ -34,11 +34,7 @@ public class Client {
 			DatagramPacket sendPacket = new DatagramPacket(
 					sendData,sendData.length, IPAddress, 61027);
 			
-			int counter = 0;
-			while(counter < 3) {
-				clientSocket.send(sendPacket);
-				counter++;
-			}
+			clientSocket.send(sendPacket);
 			clientSocket.close();
 			
 		}

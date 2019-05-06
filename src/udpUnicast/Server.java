@@ -82,7 +82,7 @@ public class Server implements Runnable{
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(10*1000);
+				Thread.sleep(5*1000);
 				String sentence = new String(receiverPacket.getData());
 				System.out.println(Thread.currentThread().getName() + " Message received: " + sentence);
 			} 
