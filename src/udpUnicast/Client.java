@@ -1,9 +1,13 @@
 package udpUnicast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * Client responsible for connecting to Server.
@@ -12,25 +16,41 @@ import java.net.SocketException;
  */
 public class Client {
 
+	/**
+	 * Sends messages to Server
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		String message = "";
-		
+		BufferedReader inFromUser = new BufferedReader(
+				new InputStreamReader(System.in)); 
 		try {
-			DatagramSocket socket = new DatagramSocket(62017);
-			while(true) {
-				byte[] data = new byte[1024];
-				DatagramPacket receivePacket = new DatagramPacket(data, data.length);
-				socket.receive(receivePacket);
-				message = new String(receivePacket.getData());
-				System.out.println(message.trim());
-			}
+			DatagramSocket clientSocket = new DatagramSocket();
+			InetAddress IPAddress = InetAddress.getByName("localhost");
 			
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			byte[] sendData = new byte[1024];
+			String sentence = inFromUser.readLine();
+			sendData = sentence.getBytes();
+			
+			DatagramPacket sendPacket = new DatagramPacket(
+					sendData,sendData.length, IPAddress, 61027);
+			
+			int counter = 0;
+			while(counter < 3) {
+				clientSocket.send(sendPacket);
+				counter++;
+			}
+			clientSocket.close();
+			
 		}
+		catch (SocketException e) {
+			System.out.println("Socket Exception");
+		}
+		catch (UnknownHostException e) {
+			System.out.println("Unknown Exception");
+		}
+		catch (IOException e) {
+			System.out.println("IO Exception");
+		} 
 		
 	}
 }
